@@ -1,6 +1,8 @@
 package com.nammaoor.sevai;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.*;
 import android.graphics.Color;
@@ -16,10 +18,17 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        createHomePage();
+        createRegisterPage();
+        
+        // ஆப் திறக்கும்போது முகப்புப் பக்கத்தைக் காட்டு
+        setContentView(homePage);
+    }
 
-        // ==========================================
-        // 1. முகப்புப் பக்கம் (HOME PAGE DESIGN)
-        // ==========================================
+    // ==========================================
+    // 1. முகப்புப் பக்கம் உருவாக்கம்
+    // ==========================================
+    private void createHomePage() {
         homePage = new ScrollView(this);
         homePage.setBackgroundColor(Color.parseColor("#E8EAED"));
         
@@ -34,16 +43,22 @@ public class MainActivity extends Activity {
         title.setGravity(Gravity.CENTER);
         title.setTypeface(null, Typeface.BOLD);
         
-        // தொழிலாளர் பதிவு செய்யும் பட்டன் (புதிதாகச் சேர்த்தது)
         Button goRegisterBtn = new Button(this);
         goRegisterBtn.setText("👷 உங்கள் தொழிலை பதிவு செய்ய");
-        goRegisterBtn.setBackgroundColor(Color.parseColor("#4CAF50")); // பச்சை நிறம்
+        goRegisterBtn.setBackgroundColor(Color.parseColor("#4CAF50"));
         goRegisterBtn.setTextColor(Color.WHITE);
         goRegisterBtn.setTextSize(18);
         LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         btnParams.setMargins(0, 30, 0, 50);
         goRegisterBtn.setLayoutParams(btnParams);
+
+        goRegisterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContentView(registerPage);
+            }
+        });
 
         TextView subtitle = new TextView(this);
         subtitle.setText("உங்களுக்கு தேவையான சேவையைத் தேர்ந்தெடுக்கவும்:");
@@ -60,7 +75,7 @@ public class MainActivity extends Activity {
             "🎨 பெயிண்டர்", "🔧 மெக்கானிக்", "👨‍🍳 சமையல் வேலைக்கு ஆட்கள்"
         };
 
-        for (String s : services) {
+        for (final String s : services) {
             Button btn = new Button(this);
             btn.setText(s);
             btn.setBackgroundColor(Color.WHITE);
@@ -69,13 +84,24 @@ public class MainActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             p.setMargins(0, 0, 0, 20);
             btn.setLayoutParams(p);
+            
+            // சேவையை கிளிக் செய்தால் தொழிலாளர் பட்டியல் பக்கம் திறக்கும்
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showWorkerList(s);
+                }
+            });
+
             homeLayout.addView(btn);
         }
         homePage.addView(homeLayout);
+    }
 
-        // ==========================================
-        // 2. பதிவுப் படிவம் (REGISTER PAGE DESIGN)
-        // ==========================================
+    // ==========================================
+    // 2. தொழிலாளர் பதிவுப் பக்கம் உருவாக்கம்
+    // ==========================================
+    private void createRegisterPage() {
         registerPage = new ScrollView(this);
         registerPage.setBackgroundColor(Color.WHITE);
         
@@ -107,7 +133,7 @@ public class MainActivity extends Activity {
 
         Button submitBtn = new Button(this);
         submitBtn.setText("பதிவு செய்");
-        submitBtn.setBackgroundColor(Color.parseColor("#FF9800")); // ஆரஞ்சு நிறம்
+        submitBtn.setBackgroundColor(Color.parseColor("#FF9800"));
         submitBtn.setTextColor(Color.WHITE);
         submitBtn.setTextSize(18);
         
@@ -131,19 +157,6 @@ public class MainActivity extends Activity {
         
         registerPage.addView(regLayout);
 
-        // ==========================================
-        // 3. பட்டன் வேலை செய்யும் விதம் (ACTIONS)
-        // ==========================================
-        
-        // பதிவு செய்ய பட்டனை அழுத்தினால் படிவம் திறக்கும்
-        goRegisterBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setContentView(registerPage); 
-            }
-        });
-
-        // பின் செல்ல பட்டனை அழுத்தினால் முகப்புப் பக்கம் வரும்
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,16 +164,120 @@ public class MainActivity extends Activity {
             }
         });
 
-        // பதிவு செய் பட்டனை அழுத்தினால் மெசேஜ் வரும்
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "உங்கள் விவரங்கள் வெற்றிகரமாக பதிவு செய்யப்பட்டன!", Toast.LENGTH_LONG).show();
-                setContentView(homePage); // மீண்டும் முகப்புப் பக்கத்திற்குச் செல்லும்
+                setContentView(homePage); 
+            }
+        });
+    }
+
+    // ==========================================
+    // 3. தொழிலாளர்கள் பட்டியலைக் காட்டும் புதிய பக்கம்
+    // ==========================================
+    private void showWorkerList(String serviceName) {
+        ScrollView workerPage = new ScrollView(this);
+        workerPage.setBackgroundColor(Color.WHITE);
+        
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 50, 40, 50);
+
+        TextView title = new TextView(this);
+        title.setText(serviceName + " - பணியாளர்கள்");
+        title.setTextSize(24);
+        title.setTextColor(Color.parseColor("#D32F2F"));
+        title.setGravity(Gravity.CENTER);
+        title.setPadding(0, 0, 0, 50);
+        layout.addView(title);
+
+        // ஒரு மாதிரி (Dummy) தொழிலாளர் அட்டை 
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setBackgroundColor(Color.parseColor("#F1F8E9")); // மெல்லிய பச்சை நிறம்
+        card.setPadding(40, 40, 40, 40);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        cardParams.setMargins(0, 0, 0, 50);
+        card.setLayoutParams(cardParams);
+
+        TextView workerName = new TextView(this);
+        workerName.setText("பெயர்: ரமேஷ்");
+        workerName.setTextSize(20);
+        workerName.setTextColor(Color.BLACK);
+        workerName.setTypeface(null, Typeface.BOLD);
+
+        TextView workerExp = new TextView(this);
+        workerExp.setText("அனுபவம்: 5 வருடங்கள்");
+        workerExp.setTextSize(16);
+        workerExp.setPadding(0, 10, 0, 30);
+
+        // 📞 கால் செய்யும் பட்டன்
+        Button callBtn = new Button(this);
+        callBtn.setText("📞 கால் செய்ய (Call)");
+        callBtn.setBackgroundColor(Color.parseColor("#2196F3")); // நீல நிறம்
+        callBtn.setTextColor(Color.WHITE);
+        callBtn.setTextSize(18);
+        
+        callBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:9876543210")); // மாதிரி நம்பர்
+                startActivity(intent);
             }
         });
 
-        // ஆப் திறக்கும்போது முகப்புப் பக்கத்தைக் காட்ட வேண்டும்
-        setContentView(homePage);
+        // 💬 வாட்ஸ்அப் பட்டன் (புதிதாக சேர்க்கப்பட்டது)
+        Button whatsappBtn = new Button(this);
+        whatsappBtn.setText("💬 வாட்ஸ்அப் (WhatsApp)");
+        whatsappBtn.setBackgroundColor(Color.parseColor("#25D366")); // வாட்ஸ்அப் பச்சை நிறம்
+        whatsappBtn.setTextColor(Color.WHITE);
+        whatsappBtn.setTextSize(18);
+        LinearLayout.LayoutParams waParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        waParams.setMargins(0, 20, 0, 0); 
+        whatsappBtn.setLayoutParams(waParams);
+
+        // வாட்ஸ்அப்பைத் திறக்கும் கோடிங்
+        whatsappBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    String url = "https://wa.me/919876543210?text=வணக்கம், 'நம்ம ஊர் சேவை' ஆப் மூலம் உங்களை தொடர்புகொள்கிறேன்.";
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(url));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "வாட்ஸ்அப் திறக்க முடியவில்லை!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        card.addView(workerName);
+        card.addView(workerExp);
+        card.addView(callBtn);
+        card.addView(whatsappBtn); // வாட்ஸ்அப் பட்டனைச் சேர்க்கிறோம்
+        
+        layout.addView(card);
+
+        // பின் செல்ல பட்டன்
+        Button backBtn = new Button(this);
+        backBtn.setText("முகப்புப் பக்கத்திற்குச் செல்ல");
+        backBtn.setBackgroundColor(Color.LTGRAY);
+        backBtn.setTextColor(Color.BLACK);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContentView(homePage);
+            }
+        });
+
+        layout.addView(backBtn);
+        workerPage.addView(layout);
+        
+        // இந்தத் தொழிலாளர் பக்கத்தை திரையில் காட்டுகிறோம்
+        setContentView(workerPage);
     }
 }
