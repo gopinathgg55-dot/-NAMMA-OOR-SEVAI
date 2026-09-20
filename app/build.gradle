@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -20,13 +21,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
 }
 
 dependencies {
-    // அடிப்படை ஆப்பிற்கு வேறு எந்த ஃபைல்களும் தற்போதைக்குத் தேவையில்லை
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    
+    // Firebase BoM மற்றும் Realtime Database லைப்ரரி
+    implementation platform('com.google.firebase:firebase-bom:33.10.0')
+    implementation 'com.google.firebase:firebase-database'
 }
