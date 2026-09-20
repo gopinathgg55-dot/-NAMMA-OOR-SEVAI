@@ -22,7 +22,7 @@ jobs:
       run: |
         cat << 'EOF' > gradlew
         #!/usr/bin/env sh
-        exec java -jar gradle-wrapper.jar "$@"
+        exec java -jar gradle/wrapper/gradle-wrapper.jar "$@"
         EOF
         chmod +x gradlew
 
