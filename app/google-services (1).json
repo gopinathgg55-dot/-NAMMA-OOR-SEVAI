@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "705737425786",
+    "project_id": "namma-oor-sevai",
+    "storage_bucket": "namma-oor-sevai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:705737425786:android:fa118cf56e76410f6bccc3",
+        "android_client_info": {
+          "package_name": "com.nammaoor.sevai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkvSESnBm_8zThMYCJHUhhvaV76m64z-Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
