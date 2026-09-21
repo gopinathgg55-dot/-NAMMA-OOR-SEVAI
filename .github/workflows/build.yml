@@ -27,7 +27,7 @@ jobs:
                 mavenCentral()
             }
             dependencies {
-                classpath "com.android.tools.build:gradle:8.1.0"
+                classpath "com.android.tools.build:gradle:7.4.2"
             }
         }
 
@@ -48,7 +48,7 @@ jobs:
         EOF
 
     - name: Generate Gradle Wrapper
-      run: gradle wrapper --gradle-version 8.0
+      run: gradle wrapper --gradle-version 7.5
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug --warning-mode all
