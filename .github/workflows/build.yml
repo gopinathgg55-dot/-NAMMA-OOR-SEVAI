@@ -47,8 +47,8 @@ jobs:
         android.nonTransitiveRClass=true
         EOF
 
-    - name: Generate Gradle Wrapper
-      run: gradle wrapper --gradle-version 7.5
+    - name: Initialize Gradle Wrapper
+      run: gradle wrapper --gradle-version 7.5 --distribution-type bin
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug --warning-mode all
