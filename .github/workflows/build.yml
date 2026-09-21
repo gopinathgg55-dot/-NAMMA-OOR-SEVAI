@@ -10,18 +10,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Android SDK - Main Fix
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-      - name: Setup Gradle 7.5 - இது தான் Main Fix
+      - name: Setup Gradle 7.5
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 7.5
@@ -88,9 +90,9 @@ jobs:
           }
           EOF
 
-      - name: Create AndroidManifest.xml
+      - name: Create AndroidManifest.xml and MainActivity
         run: |
-          mkdir -p app/src/main
+          mkdir -p app/src/main/java/com/nammaoorsevai/app
           cat > app/src/main/AndroidManifest.xml << 'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -109,7 +111,6 @@ jobs:
               </application>
           </manifest>
           EOF
-          mkdir -p app/src/main/java/com/nammaoorsevai/app
           cat > app/src/main/java/com/nammaoorsevai/app/MainActivity.java << 'EOF'
           package com.nammaoorsevai.app;
           import android.os.Bundle;
