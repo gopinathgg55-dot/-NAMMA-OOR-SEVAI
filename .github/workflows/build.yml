@@ -18,40 +18,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Create root build.gradle
-      run: |
-        cat << 'EOF' > build.gradle
-        buildscript {
-            repositories {
-                google()
-                mavenCentral()
-            }
-            dependencies {
-                classpath "com.android.tools.build:gradle:7.4.2"
-            }
-        }
-
-        allprojects {
-            repositories {
-                google()
-                mavenCentral()
-            }
-        }
-        EOF
-
-    - name: Create gradle.properties
-      run: |
-        cat << 'EOF' > gradle.properties
-        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-        android.useAndroidX=true
-        android.nonTransitiveRClass=true
-        EOF
-
-    - name: Initialize Gradle Wrapper
-      run: gradle wrapper --gradle-version 7.5 --distribution-type bin
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew assembleDebug --warning-mode all
+      run: ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
