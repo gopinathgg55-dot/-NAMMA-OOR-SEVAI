@@ -18,6 +18,63 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Create root build.gradle
+      run: |
+        cat << 'EOF' > build.gradle
+        buildscript {
+            repositories {
+                google()
+                mavenCentral()
+            }
+            dependencies {
+                classpath "com.android.tools.build:gradle:8.1.0"
+            }
+        }
+        allprojects {
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        EOF
+
+    - name: Create app build.gradle
+      run: |
+        mkdir -p app
+        cat << 'EOF' > app/build.gradle
+        plugins {
+            id 'com.android.application'
+        }
+        android {
+            namespace 'com.example.app'
+            compileSdk 34
+            defaultConfig {
+                applicationId "com.example.app"
+                minSdk 24
+                targetSdk 34
+                versionCode 1
+                versionName "1.0"
+            }
+        }
+        EOF
+
+    - name: Create AndroidManifest.xml
+      run: |
+        mkdir -p app/src/main
+        cat << 'EOF' > app/src/main/AndroidManifest.xml
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="com.example.app">
+            <application android:label="App">
+                <activity android:name=".MainActivity" android:exported="true">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                </activity>
+            </application>
+        </manifest>
+        EOF
+
     - name: Generate Gradle Wrapper
       run: gradle wrapper --gradle-version 8.0
 
