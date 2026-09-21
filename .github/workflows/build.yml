@@ -1,5 +1,4 @@
 name: Android Build
-
 on:
   push:
     branches: [ "main" ]
@@ -20,78 +19,21 @@ jobs:
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-      - name: Setup Gradle 7.5 - Cache OFF
-        uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 7.5
           cache-disabled: true
 
-      - name: Create Project Files
+      - name: Auto-Fix Firebase Libraries
         run: |
-          cat > build.gradle << 'EOF'
-          buildscript {
-              repositories { google(); mavenCentral() }
-              dependencies { classpath 'com.android.tools.build:gradle:7.4.2' }
-          }
-          allprojects { repositories { google(); mavenCentral() } }
-          EOF
-          cat > settings.gradle << 'EOF'
-          include ':app'
-          EOF
-          cat > gradle.properties << 'EOF'
-          android.useAndroidX=true
-          org.gradle.jvmargs=-Xmx2g
-          EOF
-          mkdir -p app
-          cat > app/build.gradle << 'EOF'
-          plugins { id 'com.android.application' }
-          android {
-              namespace 'com.nammaoorsevai.app'
-              compileSdk 33
-              defaultConfig {
-                  applicationId "com.nammaoorsevai.app"
-                  minSdk 21; targetSdk 33; versionCode 1; versionName "1.0"
-              }
-              buildTypes { release { minifyEnabled false } }
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
-              }
-          }
-          dependencies {
-              implementation 'androidx.appcompat:appcompat:1.6.1'
-          }
-          EOF
-          mkdir -p app/src/main/res/values
-          mkdir -p app/src/main/java/com/nammaoorsevai/app
-          cat > app/src/main/AndroidManifest.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <application android:allowBackup="true" android:label="Namma Oor Sevai" android:theme="@android:style/Theme.Light">
-                  <activity android:name=".MainActivity" android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
-          cat > app/src/main/res/values/strings.xml << 'EOF'
-          <resources><string name="app_name">NAMMA OOR SEVAI</string></resources>
-          EOF
-          cat > app/src/main/java/com/nammaoorsevai/app/MainActivity.java << 'EOF'
-          package com.nammaoorsevai.app;
-          import android.os.Bundle;
-          import androidx.appcompat.app.AppCompatActivity;
-          public class MainActivity extends AppCompatActivity {
-              @Override protected void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
-          }
-          EOF
+          # உங்க app/build.gradle-ல் Firebase இல்லை என்றால் தானாக சேர்க்கும்
+          if ! grep -q "firebase-firestore" app/build.gradle; then
+            sed -i "/dependencies {/a \    implementation platform('com.google.firebase:firebase-bom:32.7.0')\n    implementation 'com.google.firebase:firebase-firestore'\n    implementation 'com.google.android.gms:play-services-tasks:18.0.2'" app/build.gradle
+          fi
+          cat app/build.gradle
 
-      - name: Generate Wrapper and Build
+      - name: Build APK
         run: |
-          gradle wrapper --gradle-version 7.5
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
 
