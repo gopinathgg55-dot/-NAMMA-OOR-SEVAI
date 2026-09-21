@@ -18,8 +18,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Android SDK and Accept Licenses
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          sdkmanager --version || true
+          echo "y" | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "platforms;android-33" "build-tools;33.0.2" "platform-tools" || true
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
