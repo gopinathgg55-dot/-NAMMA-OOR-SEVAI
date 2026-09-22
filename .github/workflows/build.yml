@@ -2,49 +2,51 @@ name: Android Build
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        - name: Setup Android SDK
-  uses: android-actions/setup-android@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
-      - name: Setup Android SDK and Accept Licenses
-        run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-33" "build-tools;33.0.2"
+    - name: Setup Android SDK and Accept Licenses
+      run: |
+        yes | sdkmanager --licenses || true
+        sdkmanager "platforms;android-33" "build-tools;33.0.2"
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '8.7'
 
-      - name: Prepare Android User Home
-        run: |
-          export ANDROID_USER_HOME="$RUNNER_TEMP/android-user-home"
-          mkdir -p "$ANDROID_USER_HOME"
-          chmod -R 777 "$ANDROID_USER_HOME"
-          echo "ANDROID_USER_HOME=$ANDROID_USER_HOME" >> "$GITHUB_ENV"
+    - name: Prepare Android User Home
+      run: |
+        export ANDROID_USER_HOME="$RUNNER_TEMP/android-user-home"
+        mkdir -p "$ANDROID_USER_HOME"
+        chmod -R 777 "$ANDROID_USER_HOME"
+        echo "ANDROID_USER_HOME=$ANDROID_USER_HOME" >> $GITHUB_ENV
 
-      - name: Build APK
-        run: |
-          mkdir -p "$ANDROID_USER_HOME"
-          gradle assembleDebug --stacktrace
+    - name: Build APK
+      run: |
+        mkdir -p "$ANDROID_USER_HOME"
+        gradle assembleDebug --stacktrace
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Namma-Oor-Sevai-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Namma-Oor-Sevai-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
