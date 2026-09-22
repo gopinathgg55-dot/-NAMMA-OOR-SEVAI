@@ -25,6 +25,8 @@ jobs:
 
     - name: Setup Android SDK and Accept Licenses
       run: |
+        mkdir -p $HOME/.android
+        touch $HOME/.android/repositories.cfg
         yes | sdkmanager --licenses || true
         sdkmanager "platforms;android-33" "build-tools;33.0.2"
 
